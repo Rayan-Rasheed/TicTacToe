@@ -1,0 +1,398 @@
+#include <iostream>
+#include <fstream>
+#include <conio.h>
+using namespace std;
+const int size = 3;
+char board[size][size] = {{' ', ' ', ' '},
+                          {' ', ' ', ' '},
+                          {' ', ' ', ' '}};
+void load();
+void store();
+bool row_detect(char symbol);
+bool column_detect(char symbol);
+bool diagonal(char symbol);
+void take_input();
+bool win(char symbol);
+void coordinate(string m_coordinate);
+void board_show();
+void r_board();
+void play_new();
+void play_load();
+
+char winner;
+int absissa;
+int ordinate;
+string play_1;
+string play_2;
+int choice;
+int load_COUNT = 0;
+
+main()
+{
+
+    while (choice != 3)
+    {
+
+        system("cls");
+        cout << "\t\t***********Tik Tak Toe*****************" << endl;
+        // board_show();
+        cout
+            << "\t\t1.Play New game:" << endl;
+        cout << "\t\t2.Load/continue Game:" << endl;
+        cout << "\t\t3.Exit:\n"
+             << endl;
+        cout << "Press any option to continue...";
+        cin >> choice;
+        if (choice == 1)
+        {
+            play_new();
+        }
+        else if (choice == 2)
+        {
+            play_load();
+        }
+    }
+}
+void play_new()
+{
+    system("cls");
+    r_board();
+    board_show();
+    cout << "Enter Player(O) name:";
+    cin >> play_1;
+    cout << "Enter Player(X) name:";
+    cin >> play_2;
+
+    cout << "Press any button to start game_";
+    getch();
+    take_input();
+    store();
+
+    load_COUNT = 1;
+}
+void play_load()
+{
+    if (load_COUNT == 1)
+    {
+        system("cls");
+        load();
+        board_show();
+        // take_input();
+        getch();
+    }
+}
+void load()
+{
+    fstream file;
+    file.open("read.txt", ios::in);
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            file >> board[i][j];
+        }
+    }
+}
+void store()
+{
+    fstream file;
+    file.open("read.txt", ios::out);
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            file << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+    file.close();
+}
+void r_board()
+{
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            board[i][j] = ' ';
+        }
+    }
+}
+
+bool row_detect(char symbol)
+{
+    bool flag = false;
+    for (int j = 0; j < size; j++)
+    {
+        int count = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+
+            if (board[j][i] == symbol)
+            {
+                count++;
+            }
+        }
+
+        if (count == size)
+        {
+
+            flag = true;
+        }
+    }
+    return flag;
+}
+bool column_detect(char symbol)
+{
+    bool flag = false;
+    for (int j = 0; j < 3; j++)
+    {
+        int count = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+
+            if (board[i][j] == symbol)
+            {
+                count++;
+            }
+        }
+
+        if (count == size)
+        {
+
+            flag = true;
+        }
+    }
+    return flag;
+}
+bool diagonal(char symbol)
+{
+    // checking diagonal match***************************************************
+    bool flag = false;
+    int count;
+    count = 0;
+
+    for (int i = 0; i < size; i++)
+    {
+
+        if (board[i][i] == symbol)
+        {
+            count++;
+        }
+    }
+    if (count == size)
+    {
+
+        flag = true;
+    }
+    count = 0;
+
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[1][1] == symbol)
+    {
+
+        flag = true;
+    }
+
+    return flag;
+    // diagonal match end********************************************
+}
+bool win(char symbol)
+{
+    //*****************this function return true if any column, row or diagonal match*******************
+    if (row_detect(symbol) == true || column_detect(symbol) == true || diagonal(symbol) == true)
+    {
+
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+    //******************************************************************************
+}
+void take_input()
+{
+
+    system("cls");
+    board_show();
+    string choice;
+    char player = 'O';
+    int count = 0;
+    bool WIN = false;
+    while (true)
+    {
+
+        if (player == 'O')
+        {
+            // player1(O) turn*****************************************************
+            int end = 0;
+            while (end != 1)
+            {
+                cout << endl
+                     << endl;
+                cout << play_1 << " (O) turn......";
+                cin >> choice;
+
+                coordinate(choice);
+
+                if (board[absissa][ordinate] == ' ')
+                {
+
+                    board[absissa][ordinate] = player;
+                    end = 1;
+                }
+                else
+                {
+
+                    cout << "Invalid input....";
+                }
+            }
+
+            board_show();
+            count++;
+            WIN = win(player);
+            if (WIN == true)
+            {
+                store();
+                cout << endl;
+                cout << "*********CONGRATULATIONS!  " << play_1 << "(" << player << ")"
+                     << " WON*********.\n\n"
+                     << endl;
+                cout << "Press any key to go back...";
+                getch();
+
+                break;
+            }
+            player = 'X';
+        }
+        if (player == 'X')
+        {
+            // player 2 (X) turn****************************************************
+
+            int end = 0;
+            while (end != 1)
+            {
+                cout << endl
+                     << endl;
+                cout << play_2 << " X's turn......";
+                cin >> choice;
+                coordinate(choice);
+                if (board[absissa][ordinate] == ' ')
+                {
+
+                    board[absissa][ordinate] = player;
+                    end = 1;
+                }
+                else
+                {
+
+                    cout << "Invalid input....";
+                }
+            }
+            board_show();
+            count++;
+            WIN = win(player);
+            if (WIN == true)
+            {
+                store();
+                cout << endl;
+                cout << "*********CONGRATULATIONS! " << play_2 << "(" << player << ")"
+                     << " WON*********\n\n"
+                     << endl;
+
+                getch();
+
+                break;
+            }
+            player = 'O';
+        }
+
+        if (WIN == false)
+        {
+            // if all board is filled and no player win then match draw*******************************
+            if (count == 9)
+            {
+                cout << endl;
+                cout << "        ******Match Draw********" << endl;
+                break;
+            }
+        }
+    }
+}
+void board_show()
+{
+    system("cls");
+
+    cout << "\n\n             -------------- Tic Tac toe Game-------------------               \n\n";
+
+    cout << "\t\t" << play_1 << "(O) * *********VS * *********" << play_2 << "(X) " << endl
+         << endl;
+    cout << endl;
+    cout << "\t\t\t    1       2       3   " << endl;
+    cout << "\t\t\t _______________________" << endl;
+    cout << "\t\t\t|       |       |       |" << endl;
+    cout << "\t\tA\t|   " << board[0][0] << "   |  " << board[0][1] << "    |  " << board[0][2] << "    |" << endl;
+
+    cout << "\t\t\t|_______|_______|_______|" << endl;
+    cout << "\t\t\t|       |       |       |" << endl;
+
+    cout << "\t\tB\t|   " << board[1][0] << "   |  " << board[1][1] << "    |  " << board[1][2] << "    |" << endl;
+
+    cout << "\t\t\t|_______|_______|_______|" << endl;
+    cout << "\t\t\t|       |       |       |" << endl;
+
+    cout << "\t\tC\t|   " << board[2][0] << "   |  " << board[2][1] << "    |  " << board[2][2] << "    |" << endl;
+
+    cout << "\t\t\t|_______|_______|_______|" << endl
+
+         << endl;
+}
+void coordinate(string m_coordinate)
+{
+    // generating coordinate from A0 type form************************
+    string output;
+
+    char a = m_coordinate[0];
+    char b = m_coordinate[1];
+    if (a == 'A')
+    {
+        absissa = 0;
+    }
+    else if (a == 'B')
+    {
+        absissa = 1;
+    }
+    else if (a == 'C')
+    {
+        absissa = 2;
+    }
+    else if (a == 'D')
+    {
+        absissa = 3;
+    }
+    else if (a == 'E')
+    {
+        absissa = 4;
+    }
+    if (b == '1')
+    {
+        ordinate = 0;
+    }
+    else if (b == '2')
+    {
+        ordinate = 1;
+    }
+    else if (b == '3')
+    {
+        ordinate = 2;
+    }
+    else if (b == '4')
+    {
+        ordinate = 3;
+    }
+    else if (b == '5')
+    {
+        ordinate = 4;
+    }
+}
